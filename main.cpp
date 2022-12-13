@@ -6,21 +6,27 @@ using namespace std;
 struct node
 {
     int index ;
-    char label[100] ;
+    //char label[26] ;
+    int begn;
+    int length;
     node **children ;
     node()
     {
         index = -1 ;
-        children = new node*[100] ;
-        for (int i=0 ; i<100 ; i++)
+        begn=-1;
+        length=0;
+        children = new node*[26] ;
+        for (int i=0 ; i<26 ; i++)
             children[i] = NULL ;
     }
     node(char sub[] , int id)
     {
-        strcpy(label, sub) ;
+        //strcpy(label, sub) ;
         index = id ;
-        children = new node*[100] ;
-        for (int i=0 ; i<100 ; i++)
+        begn=id;
+        length=strlen(sub);
+        children = new node*[26] ;
+        for (int i=0 ; i<26 ; i++)
             children[i] = NULL ;
 
     }
@@ -29,21 +35,21 @@ class suffixTree
 {
 public :
     node *root ;
-    void print(node* n , const char a[100])
+    /*void print(node* n , const char a[26])
     {
         if (n->index  != -1)
         {
             cout << a << endl;
             return;
         }
-        for (int i=0 ; i<100 ; i++)
+        for (int i=0 ; i<26 ; i++)
         {
             node* currentChild = n->children[i] ;
             if (currentChild == NULL)
                 break ;
             else
             {
-                char x[100] ;
+                char x[26] ;
                 strcpy(x,a) ;
                 strcat(x,currentChild->label) ;
                 print(currentChild , x) ;
@@ -51,83 +57,89 @@ public :
 
         }
 
-    }
+    }*/
 public:
     suffixTree(char word[])
     {
         //initializing root node
         root = new node() ;
         // adding special char
-        //strcat(word, "$") ;
+        strcat(word, "$") ;
 
         int n = strlen(word) ;
-
 
         for (int i=0 ; i<n ; i++)
         {
             // getting suffix substring from i
             char *a = word + i ;
-            char suffix[100];
+            char suffix[26];
             strcpy(suffix,a) ;
 
-            for (int j=0 ; j<100 ; j++)
+            for (int j=0 ; j<26 ; j++)
             {
+                char label[26];
                 node* currentChild =  root->children[j] ;
                 if (currentChild == NULL)
                 {
                     root->children[j] = new node(suffix , i) ;
                     break ;
                 }
-                else if (suffix[0] == currentChild->label[0])
+                strncpy(label,word+currentChild->begn,currentChild->length);
+                if (suffix[0] == label[0])
                 {
                     int q=0 ;
-                    while ( currentChild->label[q]!= '\0' && suffix[q] == currentChild->label[q] )
+                    while ( label[q]!= '\0' && suffix[q] ==label[q] )
                     {
 //                        cout << "#" << suffix[q] << "\n" ;
                         q++ ;
                     }
-                    char commonLabel[100] ;
+                    char commonLabel[26] ;
 //                    cout << "1-common: "<<currentChild->label << " " << q<< endl;
-                    strncpy(commonLabel, currentChild->label, q) ;
+                    strncpy(commonLabel, label, q) ;
                     commonLabel[q] = '\0' ;
 //                    cout << "common: "<<commonLabel << endl;
                     node *x = new node (commonLabel , -1);
+                    x->begn=currentChild->begn;
+                    x->length=q;
 
                     x->children[0] = currentChild ;
-                    x->children[1] = new node (suffix+q , i) ;
+                    x->children[1] = new node (suffix+q , i+q) ;
                     root->children[j] = x ;
-                    char aa[100] ;
+                    currentChild->begn=currentChild->begn+q;
+                    currentChild->length-=q;
+                    /*char aa[26] ;
                     strcpy(aa ,currentChild->label) ;
                     char *bb = aa+q ;
-                    strcpy( currentChild->label , bb ) ;
+                    strcpy( currentChild->label , bb ) ;*/
                     break;
                 }
             }
         }
 
     }
-    void printAll ()
+   /* void printAll ()
     {
         print(root , "") ;
-    }
+    }*/
 
 };
 
 int main()
 {
-    suffixTree t("abbc") ;
+    char a[]="banana";
+    suffixTree t(a) ;
     for (int i=0 ; i<4 ; i++)
     {
         if (t.root->children[i] != NULL)
-            cout << t.root->children[i]->index << " " << t.root->children[i]->label << endl;
+            cout << t.root->children[i]->index << " "<<t.root->children[i]->begn<<" "<<t.root->children[i]->length << endl;
         else
             cout << "null\n";
     }
-    cout << t.root->children[1]->children[0]->index << " " << t.root->children[1]->children[0]->label << endl;
-    cout << t.root->children[1]->children[1]->index << " " << t.root->children[1]->children[1]->label << endl;
+    cout << t.root->children[2]->children[0]->index <<" " << t.root->children[2]->children[0]->begn<< " "<< t.root->children[2]->children[0]->length<< endl;
+    cout << t.root->children[2]->children[1]->index <<" " << t.root->children[2]->children[1]->begn<< " "<< t.root->children[2]->children[1]->length<< endl;
 //    cout << t.root->children[1]->children[1]->label << endl;
     cout << "all \n" ;
-    t.printAll();
+   // t.printAll();
 
     return 0;
 }
