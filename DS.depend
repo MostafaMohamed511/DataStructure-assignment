@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1670947130 source:c:\users\dell\desktop\ds\main.cpp
+	<iostream>
+	<cstring>
+
