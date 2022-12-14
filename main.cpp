@@ -10,8 +10,8 @@ struct node
     node **children ;
     node(){
         index = -1 ;
-        children = new node*[100] ;
-        for (int i=0 ; i<100 ; i++)
+        children = new node*[53] ;
+        for (int i=0 ; i<53 ; i++)
             children[i] = NULL ;
     }
     node(int start,int len,int id)
@@ -19,8 +19,8 @@ struct node
         this->start=start;
         this->len=len;
         index = id ;
-        children = new node*[100] ;
-        for (int i=0 ; i<100 ; i++) children[i] = NULL ;
+        children = new node*[53] ;
+        for (int i=0 ; i<53 ; i++) children[i] = NULL ;
 
     }
 };
@@ -28,22 +28,50 @@ class suffixTree{
 public :
     char * txt;
     node *root ;
-    void print(node* n){
+
+
+    void bc(node* n,string word){
         if (n->index  != -1){
+            cout<<n->index<<" ";
             return;
         }
-        for (int i=0 ; i<100 ; i++){
-            node* currentChild = n->children[i] ;
-            if (currentChild == NULL){
-                return ;
+        int idx=word[0]-'a';    if(word[0]=='$')  idx=52;
+        if(n->children[idx]!=NULL){
+            int i=1;
+            node* currentChild = n->children[idx] ;
+            while(txt[currentChild->start+i]==word[i] && i<currentChild->len){
+                i++;
+            }
+            if(i<currentChild->len && i<word.size()){
+                cout<<"Not Found1 \n";
             }
             else{
-                for(int i=0;i<currentChild->len;i++){
-                    cout<<txt[(currentChild->start)+i];
+                if(word.size()>i){
+                    bc(currentChild,word.substr(i));
                 }
+                else {
+                    print(currentChild);
+                }
+            }
+        }
+        else 
+        {
+            cout<<"Not Found \n";
+        }
+
+    }
+
+
+    void print(node* n){
+        if (n->index  != -1){
+            cout<<n->index<<" ";
+            return;
+        }
+        for (int i=0 ; i<53 ; i++){
+            node* currentChild = n->children[i] ;
+            if (currentChild != NULL){
                 print(currentChild) ;
             }
-
         }
 
     }
@@ -53,12 +81,9 @@ public:
         // txt=new char[sizeof(word)];
         strcpy(txt,word);
         //initializing root node
-        root = new node(-1,-1,-1) ;
-        // adding special char
-        //strcat(word, "$") ;
+        root = new node(0,0,-1) ;
 
         int n = strlen(word) ;
-
 
         for (int i=0 ; i<n ; i++)
         {
@@ -66,45 +91,46 @@ public:
             char *a = word + i ;
             char *suffix=new char[sizeof(word)-i];
             strcpy(suffix,a) ;
-            //cout<<suffix;
+            int idx=suffix[0]-'a';
+            if(suffix[0]=='$')  idx=52;
+            node* currentChild =  root->children[idx] ;
+            if (currentChild == NULL){
+                root->children[idx] = new node(i,sizeof(suffix)-i-1, i) ;
 
-            for (int j=0 ; j<100 ; j++)
-            {
-                node* currentChild =  root->children[j] ;
-                if (currentChild == NULL){
-                    root->children[j] = new node(i,sizeof(suffix)-i, i) ;
-                    break ;
-                }
-                else if (suffix[0] == txt[currentChild->start])
-                {
-                    int q=0 ;
-                    while ( currentChild->len>q && suffix[q] == txt[currentChild->start+q]){
-//                        cout << "#" << suffix[q] << "\n" ;
-                        q++ ;
-                    }
-                    // char commonLabel[100] ;
-//                    cout << "1-common: "<<currentChild->label << " " << q<< endl;
-                    // strncpy(commonLabel, currentChild->label, q) ;
-                    // commonLabel[q] = '\0' ;
-//                    cout << "common: "<<commonLabel << endl;
-
-                    node *x = new node (currentChild->start , q , -1);
-
-                    //modify the current child
-                    currentChild->start+=q;
-                    currentChild->len-=q;
-
-                    x->children[0] = currentChild ;
-                    x->children[1] = new node (i+q, sizeof(suffix)-i-q, i) ;
-                    root->children[j] = x ;
-                    break;
-                }
             }
+            else if (suffix[0] == txt[currentChild->start])
+            {
+                int q=0 ;
+                while ( currentChild->len>q && suffix[q] == txt[currentChild->start+q]){
+                    q++;
+                }
+
+                node *x = new node (currentChild->start , q , -1);
+
+                //modify the current child
+                currentChild->start+=q;
+                currentChild->len-=q;
+
+                int y = txt[currentChild->start]=='$'?52:txt[currentChild->start]-'a';
+                x->children[y] = currentChild ;
+                y=txt[i+q]=='$'?52:txt[i+q]-'a';
+                x->children[y] = new node (i+q, sizeof(suffix)-i-q-1, i) ;
+                root->children[idx] = x ;
+            }
+
         }
 
     }
-    void printAll ()
-    {
+    void search(char word[]){
+        int idx=word[0]-'a';
+        if(root->children[idx]!=NULL){
+            bc(root,word);
+        }
+        else {
+            cout<<"Not Found \n";
+        }
+    }
+    void printAll (){
         print(root) ;
     }
 
@@ -112,19 +138,15 @@ public:
 
 int main()
 {
-    suffixTree t("abbc") ;
-    /*for (int i=0 ; i<4 ; i++)
-    {
-        if (t.root->children[i] != NULL)
-            cout << t.root->children[i]->index << " " << t.root->children[i]->label << endl;
-        else
-            cout << "null\n";
-    }
-    /*cout << t.root->children[1]->children[0]->index << " " << t.root->children[1]->children[0]->label << endl;
-    cout << t.root->children[1]->children[1]->index << " " << t.root->children[1]->children[1]->label << endl;
-//    cout << t.root->children[1]->children[1]->label << endl;
-    cout << "all \n" ;*/
-    t.printAll();
+    suffixTree t("banana$") ;
+    
+    //t.search("banana");
+    //t.search("banana$");
+    //t.search("anana");
+    //t.search("nan");
+    // t.search("an");
+    // t.search("na");
+    //t.printAll();
 
     return 0;
 }
