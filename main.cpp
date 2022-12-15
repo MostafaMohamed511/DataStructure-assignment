@@ -181,25 +181,21 @@ public:
 int main()
 {
   // 1st sample
-  cout << "first sample :\n" ;
+  cout << "assignment sample without change :\n" ;
   suffixTree t1("bananabanaba$");
   t1.search("ana"); // Prints: 1 3 7
   t1.search("naba"); // Prints: 4 8
-  // 2nd sample
-  cout << "second sample :\n" ;
-  suffixTree t2("banana$");
-  t2.search("ana"); //Prints: 1 3
-  t2.search("banana"); //Prints: 0
-  t2.search("banana$"); //Prints: 0
-  t2.search("anana"); //Prints: 1
-  t2.search("q"); // Prints: not found
-  // 3rd sample
-  cout << "third sample :\n" ;
-  suffixTree t3("supermikha$");
-  t3.search("k"); //Prints: 7
-  t3.search("er"); //Prints: 3
-  t3.search("mikha"); //Prints: 5
-  t3.search("h$"); //Prints: 5
-
+  char *word[10] ={ "cocowawa$", "papanpana$", "botatotata$", "catatcat$", "lolipopopo$", "banana$", "ABRACADABRA$", "AAAAAAA$", "MISSISSIPPI$", "GATAGACA$"};
+  char *tst1[10] ={ "co"       , "pan"       , "tat"        , "atat"     , "po"         , "ban"    , "BRA"         , "AA"      , "MISS"        , "GTA"} ;
+  char *tst2[10] ={ "awa"      , "app"       , "ata"        , "tc"       , "lop"        , "nab"    , "bra"         , "Ac"      , "SSI"         , "GACA"} ;
+  char *tst3[10] ={ "wac"      , "na"        , "ota"        , "dog"      , "opo"        , "a"      , "AB"          , "aa"      , "SIP"         , "TAG"} ;
+  for (int i= 0 ; i<10 ; i++)
+  {
+    cout << "sample: " << word[i] << '\n';
+    suffixTree tree(word[i]) ;
+    cout << tst1[i] << ": " ; tree.search(tst1[i]);
+    cout << tst2[i] << ": " ; tree.search(tst2[i]);
+    cout << tst3[i] << ": " ; tree.search(tst3[i]);
+  }
   return 0;
 }
